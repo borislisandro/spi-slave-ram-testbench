@@ -12,6 +12,9 @@ WAVE_FILE := $(WAVE_DIR)/$(TOP).fst
 COVERAGE_VCD := $(COVERAGE_DIR)/$(TOP).vcd
 COVERAGE_DATABASE := $(COVERAGE_DIR)/coverage.cdd
 COVERAGE_REPORT := $(COVERAGE_DIR)/coverage.txt
+GTKWAVE_OPTIONS := -4 'initial_window_x 1400' -4 'initial_window_y 900' \
+	-4 'initial_window_xpos 50' -4 'initial_window_ypos 50' \
+	-4 'do_initial_zoom_fit on'
 
 .DEFAULT_GOAL := help
 
@@ -44,7 +47,7 @@ simulate: $(SIM_BINARY)
 
 waves: simulate
 	@test -f $(WAVE_FILE)
-	gtkwave $(WAVE_FILE)
+	gtkwave $(GTKWAVE_OPTIONS) $(WAVE_FILE)
 
 lint:
 	verilator --lint-only --timing -Wall -Wno-fatal -Wno-BLKANDNBLK \
