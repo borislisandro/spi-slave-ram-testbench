@@ -1,0 +1,12 @@
+{
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "*.f": "plaintext",
+        "*.sv": "systemverilog",
+        "*.v": "verilog"
+    },
+    "verilog.ctags.path": "/usr/bin/ctags",
+    "verilog.formatting.verilogHDL.formatter": "verible-verilog-format",
+    "verilog.languageServer.veribleVerilogLs.enabled": true,
+    "verilog.linting.linter": "verilator"
+}

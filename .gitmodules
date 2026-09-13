@@ -1,0 +1,3 @@
+[submodule "third_party/spi_slave_ram"]
+	path = third_party/spi_slave_ram
+	url = https://github.com/Abdelrahman1810/SPI_Slave_with_Single_Port_RAM.git
