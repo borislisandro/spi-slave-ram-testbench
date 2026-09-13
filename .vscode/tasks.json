@@ -4,7 +4,12 @@
         {
             "label": "SPI: Compile",
             "type": "shell",
-            "command": "make compile",
+            "command": "make",
+            "args": ["compile"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "compile"]
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -14,44 +19,79 @@
         {
             "label": "SPI: Simulate",
             "type": "shell",
-            "command": "make simulate",
+            "command": "make",
+            "args": ["simulate"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "simulate"]
+            },
             "group": "test",
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "SPI: Open waves",
             "type": "shell",
-            "command": "make waves",
+            "command": "make",
+            "args": ["waves"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "waves"]
+            },
             "problemMatcher": []
         },
         {
             "label": "SPI: Lint",
             "type": "shell",
-            "command": "make lint",
+            "command": "make",
+            "args": ["lint"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "lint"]
+            },
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "SPI: Coverage",
             "type": "shell",
-            "command": "make coverage-open",
+            "command": "make",
+            "args": ["coverage-open"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "coverage-open"]
+            },
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "SPI: Coverage GUI",
             "type": "shell",
-            "command": "make coverage-gui",
+            "command": "make",
+            "args": ["coverage-gui"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "coverage-gui"]
+            },
             "problemMatcher": []
         },
         {
             "label": "SPI: Check all",
             "type": "shell",
-            "command": "make check",
+            "command": "make",
+            "args": ["check"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "check"]
+            },
             "problemMatcher": ["$gcc"]
         },
         {
             "label": "SPI: Clean",
             "type": "shell",
-            "command": "make clean",
+            "command": "make",
+            "args": ["clean"],
+            "windows": {
+                "command": "powershell.exe",
+                "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\wsl.ps1", "clean"]
+            },
             "problemMatcher": []
         }
     ]
