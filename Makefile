@@ -44,8 +44,7 @@ simulate: $(SIM_BINARY)
 
 waves: simulate
 	@test -f $(WAVE_FILE)
-	@gtkwave $(WAVE_FILE) >/dev/null 2>&1 &
-	@echo "Opened $(WAVE_FILE)"
+	gtkwave $(WAVE_FILE)
 
 lint:
 	verilator --lint-only --timing -Wall -Wno-fatal -Wno-BLKANDNBLK \
@@ -66,7 +65,7 @@ coverage-open: coverage
 	@explorer.exe "$$(wslpath -w "$$(realpath $(COVERAGE_REPORT))")"
 
 coverage-gui: coverage
-	@covered report -view $(COVERAGE_DATABASE) >/dev/null 2>&1 &
+	covered report -view $(COVERAGE_DATABASE)
 
 check: lint simulate coverage
 
