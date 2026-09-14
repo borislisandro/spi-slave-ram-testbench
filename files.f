@@ -1,4 +1,9 @@
 third_party/spi_slave_ram/Codes/RTL/RAM.v
 third_party/spi_slave_ram/Codes/RTL/SPI.v
 third_party/spi_slave_ram/Codes/RTL/instantiation.v
-tb/tb_instantiation.sv
+tb/spi_pkg.sv
+tb/transaction.sv
+tb/spi_if.sv
+tb/driver.sv
+tb/test.sv
+tb/tb_top.sv
