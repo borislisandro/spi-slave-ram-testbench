@@ -4,8 +4,8 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$repo_root"
 
-packages=(build-essential covered curl git gtkwave iverilog jq make universal-ctags verilator)
-commands=(covered curl git gtkwave iverilog jq make verilator)
+packages=(build-essential curl git gtkwave jq make universal-ctags verilator z3)
+commands=(curl git gtkwave jq make verilator z3)
 missing=()
 
 for command_name in "${commands[@]}"; do
@@ -37,7 +37,7 @@ fi
 
 git submodule update --init --recursive
 
-iverilog -V 2>&1 | sed -n '1p'
 verilator --version
+z3 --version
 gtkwave --version 2>&1 | sed -n '1p'
 verible-verilog-format --version
