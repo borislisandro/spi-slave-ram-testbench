@@ -5,5 +5,6 @@ tb/spi_pkg.sv
 tb/transaction.sv
 tb/spi_if.sv
 tb/driver.sv
+tb/monitor.sv
 tb/test.sv
 tb/tb_top.sv
