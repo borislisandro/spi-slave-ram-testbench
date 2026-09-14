@@ -7,6 +7,7 @@ module tb_top;
   string dumpfile_name;
 
   spi_if dut_if(clk);
+  // ram_if ram_if(clk);
 
   instantiation dut (
     .clk  (clk),
