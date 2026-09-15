@@ -1,35 +1,61 @@
 import spi_pkg::*;
 
 class test;
-  virtual spi_if dut_if;
+  //vifs
+  virtual spi_if dut_vif;
+  virtual ram_if ram_vif;
+
+  //tb components
   driver drv;
-  monitor mon;
+  input_monitor in_mon;
+  ram_monitor ram_mon;
+  scoreboard sb;
+
+  //Mailboxes
   mailbox #(transaction) drv_mbx;
-  mailbox #(transaction) mon_mbx;
+  mailbox #(transaction) input_mon_mbx;
+  mailbox #(transaction) ram_mon_mbx;
+
   event drv_done;
 
   function new();
     drv = new();
-    mon = new();
+    in_mon = new();
+    ram_mon = new();
+    sb = new();
+
     drv_mbx = new();
-    mon_mbx = new();
+    input_mon_mbx = new();
+    ram_mon_mbx = new();
   endfunction: new
 
   virtual task run();
-    drv.dut_if = dut_if;
-    drv.drv_mbx = drv_mbx;
-    drv.drv_done = drv_done;
+    drv.vif = dut_vif;
+    drv.mbx = drv_mbx;
+    drv.done = drv_done;
 
-    mon.dut_if = dut_if;
-    mon.mon_mbx = mon_mbx;
+    sb.input_mbx = input_mon_mbx;
+    sb.ram_mbx = ram_mon_mbx;
+
+    in_mon.vif = dut_vif;
+    in_mon.mbx = input_mon_mbx;
+
+    ram_mon.vif = ram_vif;
+    ram_mon.mbx = ram_mon_mbx;
 
     //fork join_none in driver
     drv.run();
-    mon.run();
-    get_monitor_mbx_put();
+    in_mon.run();
+    ram_mon.run();
+    sb.run();
 
     simple_wr_rd_seq();
   endtask: run
+
+  // Called from tb_top once the sequence has drained.
+  function void report();
+    sb.report();
+  endfunction: report
 
   task simple_wr_rd_seq();
     transaction trns;
@@ -47,16 +73,5 @@ class test;
     if (!trns.randomize() with {opcode == 2'b11;}) $fatal(1, "randomize failed");
     drv_mbx.put(trns); @(drv_done);
   endtask: simple_wr_rd_seq
-
-  task get_monitor_mbx_put();
-    fork
-      forever begin
-        transaction trns;
-
-        mon_mbx.get(trns);
-        $display("t:%0t [MONITOR OUTPUT] addr:%0b op_code:%0s data: %0b", $time, trns.addr, trns.opcode.name(), trns.data);
-      end
-    join_none
-  endtask: get_monitor_mbx_put
 
 endclass: test

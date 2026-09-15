@@ -4,7 +4,10 @@ third_party/spi_slave_ram/Codes/RTL/instantiation.v
 tb/spi_pkg.sv
 tb/transaction.sv
 tb/spi_if.sv
+tb/ram_if.sv
 tb/driver.sv
-tb/monitor.sv
+tb/input_monitor.sv
+tb/ram_monitor.sv
+tb/scoreboard.sv
 tb/test.sv
 tb/tb_top.sv
