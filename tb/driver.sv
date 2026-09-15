@@ -9,19 +9,21 @@ class driver;
 
 
   task run();
-    $display("t:%0t [%s]Starting", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting", $time, name);
     fork 
-      // monitor_signals();
       begin
-        $display("t:%0t [%s]Reseting dut", $time, name);
+        if (verb(VERB_DEBUG)) monitor_signals();
+      end
+      begin
+        if (verb(VERB_HIGH)) $display("t:%0t [%s]Reseting dut", $time, name);
         drive_rst();
 
         forever begin
           transaction trns;
 
-          $display("t:%0t [%s]Waiting for transactions", $time, name);
+          if (verb(VERB_HIGH)) $display("t:%0t [%s]Waiting for transactions", $time, name);
           mbx.get(trns);
-          trns.print();
+          if (verb(VERB_HIGH)) trns.print();
 
           drive_trns(trns);
           ->done;
@@ -31,7 +33,7 @@ class driver;
   endtask: run
 
   task drive_rst();
-    $display("t:%0t [%s]Initilization reset", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Initilization reset", $time, name);
     @(posedge vif.clk);
     vif.drv_rst_n <= 1'b0;
     vif.drv_mosi <= 1'b0;
@@ -71,5 +73,13 @@ class driver;
     vif.drv_ss_n <= 1'b1;
     @(posedge vif.clk);
   endtask: drive_trns
+
+  task monitor_signals();
+    forever begin
+      $display("t:%0t [%s] rst_n:%0d ss_n:%0d mosi:%0d miso:%0d",
+               $time, name, vif.rst_n, vif.ss_n, vif.mosi, vif.miso);
+      @(posedge vif.clk);
+    end
+  endtask: monitor_signals
 
 endclass: driver

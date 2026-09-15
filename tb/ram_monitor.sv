@@ -6,7 +6,7 @@ class ram_monitor;
   mailbox #(transaction) mbx;
 
   task run();
-    $display("t:%0t [%s]Starting", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting", $time, name);
     fork
       monitor_ram();
     join_none
@@ -14,7 +14,7 @@ class ram_monitor;
 
   task monitor_ram();
     transaction trns;
-    $display("t:%0t [%s]Starting SPI ram_monitor", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting SPI ram_monitor", $time, name);
     forever begin
       //wait until ss is low
       trns = new();

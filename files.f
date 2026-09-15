@@ -9,5 +9,6 @@ tb/driver.sv
 tb/input_monitor.sv
 tb/ram_monitor.sv
 tb/scoreboard.sv
+tb/environment.sv
 tb/test.sv
 tb/tb_top.sv

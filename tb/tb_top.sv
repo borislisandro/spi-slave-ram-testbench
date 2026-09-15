@@ -30,10 +30,19 @@ module tb_top;
   //Main tb loop
   initial begin
     test t0 = new();
+    int unsigned verbosity_arg;
+
+    // Set before anything runs, so every component sees the same level.
+    // 0 report only, 1 + errors and banners, 2 + per frame lines,
+    // 3 + component startup and transactions, 4 + per clock pin state.
+    if ($value$plusargs("VERBOSITY=%d", verbosity_arg))
+      verbosity = verbosity_e'(verbosity_arg);
+
     t0.dut_vif = dut_vif;
     t0.ram_vif = ram_vif;
 
-    $display("t:%0t [TB_TOP]Running test scenarios", $time);
+    if (verb(VERB_LOW))
+      $display("t:%0t [TB_TOP]Running test scenarios, verbosity %0s", $time, verbosity.name());
     t0.run();
 
     #50;

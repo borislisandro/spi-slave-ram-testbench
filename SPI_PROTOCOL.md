@@ -41,10 +41,13 @@ The logical 10-bit command frame is:
 6. Read 8 data bits from `MISO`, least-significant bit first.
 7. Pull `SS_n` high.
 
-A read-data frame only works after a read-address frame. `CHK_CMD` sends mode
-`1` to `READ_ADD` unless the DUT's internal `read_trans` latch is already set,
-and only a read-address frame sets it. Sending command `11` on its own is
-decoded as a read-address.
+`CHK_CMD` sends mode `1` to `READ_ADD` unless the DUT's internal `read_trans`
+latch is already set, and only a read-address frame sets it. That choice of
+state does not change what comes back: `READ_ADD`, `READ_DATA` and `WRITE` all
+shift identically, and the RAM decodes the command from `rx_data[9:8]` rather
+than from the state. So a read-data frame with no read-address frame in front
+of it still returns `ram[r_addr]` — it just walks through `READ_ADD` on the
+way, and `r_addr` keeps whatever the last read-address frame put there.
 
 ## Cycle timing
 
