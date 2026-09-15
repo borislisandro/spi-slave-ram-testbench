@@ -6,6 +6,8 @@ RTL_DIR := third_party/spi_slave_ram
 RTL_PATCH := patches/spi_slave_ram.patch
 RTL_PATCH_ABS := $(abspath $(RTL_PATCH))
 
+VERBOSITY ?= 2
+
 BUILD_DIR := build
 WAVE_DIR := $(BUILD_DIR)/waves
 COVERAGE_DIR := $(BUILD_DIR)/coverage
@@ -36,6 +38,7 @@ help:
 	@echo "make patch-rtl      Re-apply the local fixes to the vendor RTL"
 	@echo "make compile        Build the simulator with Verilator"
 	@echo "make simulate       Run self-checking testbench and create FST"
+	@echo "                    VERBOSITY=0..4 sets how much it prints (default 2)"
 	@echo "make waves          Simulate, then open GTKWave"
 	@echo "make kill-waves     Close every GTKWave window in WSL"
 	@echo "make lint           Lint RTL and testbench with Verilator"
@@ -62,7 +65,7 @@ $(SIM_BINARY): $(FILELIST) $(SOURCES)
 
 simulate: $(SIM_BINARY)
 	@mkdir -p $(WAVE_DIR)
-	$(SIM_BINARY) +DUMPFILE=$(WAVE_FILE)
+	$(SIM_BINARY) +DUMPFILE=$(WAVE_FILE) +VERBOSITY=$(VERBOSITY)
 
 waves:
 	@$(MAKE) --no-print-directory kill-waves

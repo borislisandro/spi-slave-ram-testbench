@@ -18,7 +18,7 @@ class scoreboard;
   int errors;
 
   task run();
-    $display("t:%0t [%s]Starting", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting", $time, name);
     fork
       compare();
     join_none
@@ -73,7 +73,7 @@ class scoreboard;
       WADDR_TRNS: begin
         w_addr     = trns.addr;
         w_addr_set = 1'b1;
-        $display("t:%0t [%s] WADDR  addr=0x%02h", $time, name, trns.addr);
+        if (verb(VERB_HIGH)) $display("t:%0t [%s] WADDR  addr=0x%02h", $time, name, trns.addr);
       end
 
       WDATA_TRNS: begin
@@ -82,42 +82,45 @@ class scoreboard;
         end else begin
           mem[w_addr]       = trns.data;
           mem_valid[w_addr] = 1'b1;
-          $display("t:%0t [%s] WDATA  mem[0x%02h] <= 0x%02h", $time, name, w_addr, trns.data);
+          if (verb(VERB_HIGH)) $display("t:%0t [%s] WDATA  mem[0x%02h] <= 0x%02h", $time, name, w_addr, trns.data);
         end
       end
 
       RADDR_TRNS: begin
         r_addr     = trns.addr;
         r_addr_set = 1'b1;
-        $display("t:%0t [%s] RADDR  addr=0x%02h", $time, name, trns.addr);
+        if (verb(VERB_HIGH)) $display("t:%0t [%s] RADDR  addr=0x%02h", $time, name, trns.addr);
       end
 
       RDATA_TRNS: begin
         if (!r_addr_set) begin
           report_error("RDATA frame with no RADDR frame before it");
         end else if (!mem_valid[r_addr]) begin
-          $display("t:%0t [%s] RDATA  mem[0x%02h] never written, read 0x%02h, not checked",
+          if (verb(VERB_HIGH)) $display("t:%0t [%s] RDATA  mem[0x%02h] never written, read 0x%02h, not checked",
                    $time, name, r_addr, trns.data);
         end else if (trns.data !== mem[r_addr]) begin
           report_error($sformatf("read-after-write mismatch at 0x%02h: wrote 0x%02h, read back 0x%02h",
                                  r_addr, mem[r_addr], trns.data));
         end else begin
-          $display("t:%0t [%s] RDATA  mem[0x%02h] => 0x%02h  MATCH", $time, name, r_addr, trns.data);
+          if (verb(VERB_HIGH)) $display("t:%0t [%s] RDATA  mem[0x%02h] => 0x%02h  MATCH", $time, name, r_addr, trns.data);
         end
       end
     endcase
   endfunction: check_and_update_model
 
+  // Nothing the model tracks is cleared by reset. In the RAM only dout and
+  // tx_valid have a reset branch: the memory array and the w_addr / r_addr
+  // registers have none, so contents and both address latches survive. The
+  // SPI block does clear its shift state and its read_trans latch, but that
+  // only changes which state a read command walks through, not what the RAM
+  // decodes from the command bits.
   function void reset_model();
-    foreach (mem_valid[i]) mem_valid[i] = 1'b0;
-    w_addr_set = 1'b0;
-    r_addr_set = 1'b0;
-    $display("t:%0t [%s] reset, reference memory cleared", $time, name);
+    if (verb(VERB_MEDIUM)) $display("t:%0t [%s] reset seen, reference memory kept", $time, name);
   endfunction: reset_model
 
   function void report_error(string message);
     errors++;
-    $display("t:%0t [%s] ERROR: %0s", $time, name, message);
+    if (verb(VERB_LOW)) $display("t:%0t [%s] ERROR: %0s", $time, name, message);
   endfunction: report_error
 
   function void report();

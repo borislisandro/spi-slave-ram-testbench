@@ -6,7 +6,7 @@ class input_monitor;
   mailbox #(transaction) mbx;
 
   task run();
-    $display("t:%0t [%s]Starting", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting", $time, name);
     fork
       monitor_rst();
       monitor_spi();
@@ -15,7 +15,7 @@ class input_monitor;
 
   task monitor_rst();
     transaction trns;
-    $display("t:%0t [%s]Starting rst input_monitor", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting rst input_monitor", $time, name);
     forever begin
       @(negedge vif.rst_n);
       trns = new();
@@ -26,7 +26,7 @@ class input_monitor;
 
   task monitor_spi();
     transaction trns;
-    $display("t:%0t [%s]Starting SPI input_monitor", $time, name);
+    if (verb(VERB_HIGH)) $display("t:%0t [%s]Starting SPI input_monitor", $time, name);
     forever begin
       //wait until ss is low
       @(negedge vif.ss_n);
