@@ -36,6 +36,8 @@ if ! command -v verible-verilog-format >/dev/null 2>&1; then
 fi
 
 git submodule update --init --recursive
+# The line above resets the vendor RTL, so put the local fixes back.
+make --no-print-directory patch-rtl
 
 verilator --version
 z3 --version

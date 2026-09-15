@@ -2,6 +2,10 @@ TOP := tb_top
 FILELIST := files.f
 SOURCES := $(shell sed '/^[[:space:]]*\(#\|$$\)/d' $(FILELIST))
 
+RTL_DIR := third_party/spi_slave_ram
+RTL_PATCH := patches/spi_slave_ram.patch
+RTL_PATCH_ABS := $(abspath $(RTL_PATCH))
+
 BUILD_DIR := build
 WAVE_DIR := $(BUILD_DIR)/waves
 COVERAGE_DIR := $(BUILD_DIR)/coverage
@@ -18,17 +22,18 @@ COVERAGE_DATA := $(COVERAGE_DIR)/coverage.dat
 COVERAGE_ANNOTATED := $(COVERAGE_DIR)/annotated
 COVERAGE_REPORT := $(COVERAGE_DIR)/coverage.txt
 
-VERILATOR_FLAGS := --binary --timing -j 0 -Wno-fatal -Wno-BLKANDNBLK --top-module $(TOP) -f $(FILELIST)
+VERILATOR_FLAGS := --binary --timing -j 0 -Wno-fatal --top-module $(TOP) -f $(FILELIST)
 GTKWAVE_OPTIONS := -4 'initial_window_x 1400' -4 'initial_window_y 900' \
 	-4 'initial_window_xpos 50' -4 'initial_window_ypos 50' \
 	-4 'do_initial_zoom_fit on'
 
 .DEFAULT_GOAL := help
 
-.PHONY: help setup compile simulate waves kill-waves lint coverage coverage-open check clean
+.PHONY: help setup patch-rtl compile simulate waves kill-waves lint coverage coverage-open check clean
 
 help:
 	@echo "make setup          Install/check WSL tools and fetch RTL"
+	@echo "make patch-rtl      Re-apply the local fixes to the vendor RTL"
 	@echo "make compile        Build the simulator with Verilator"
 	@echo "make simulate       Run self-checking testbench and create FST"
 	@echo "make waves          Simulate, then open GTKWave"
@@ -41,6 +46,13 @@ help:
 
 setup:
 	@./scripts/setup-wsl.sh
+
+# git submodule update resets the vendor RTL, which drops the timescale
+# directives and the blocking-to-non-blocking fixes the simulation needs.
+patch-rtl:
+	@git -C "$(RTL_DIR)" apply --reverse --check "$(RTL_PATCH_ABS)" 2>/dev/null \
+		&& echo "RTL patch already applied" \
+		|| git -C "$(RTL_DIR)" apply "$(RTL_PATCH_ABS)"
 
 compile: $(SIM_BINARY)
 
@@ -70,7 +82,7 @@ kill-waves:
 	@pkill -KILL -x gtkwave 2>/dev/null || true
 
 lint:
-	verilator --lint-only --timing -Wall -Wno-fatal -Wno-BLKANDNBLK \
+	verilator --lint-only --timing -Wall -Wno-fatal \
 		--top-module $(TOP) -f $(FILELIST)
 
 $(COVERAGE_BINARY): $(FILELIST) $(SOURCES)

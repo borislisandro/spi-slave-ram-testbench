@@ -5,10 +5,11 @@ class transaction;
   rand bit [ADDR_WIDTH-1:0] addr;
   rand bit [DATA_WIDTH-1:0] data;
   rand cmd_type  opcode;
+  bit mon_rst_flag;
 
   function void print();
-    if       ((opcode == WADDR_TRNS) || (opcode == RADDR_TRNS)) $display("t:%0t [%s] addr:%0h op_code:%0s", $time, name, addr, opcode.name());
-    else if  (opcode == WDATA_TRNS)                             $display("t:%0t [%s] op_code:%0s data:%0h", $time, name, opcode.name(), data);
+    if       ((opcode == WADDR_TRNS) || (opcode == RADDR_TRNS)) $display("t:%0t [%s] addr:%0b op_code:%0s", $time, name, addr, opcode.name());
+    else if  (opcode == WDATA_TRNS)                             $display("t:%0t [%s] op_code:%0s data:%0b", $time, name, opcode.name(), data);
     else                                                        $display("t:%0t [%s] op_code:%0s"         , $time, name, opcode.name());
   endfunction: print
 
