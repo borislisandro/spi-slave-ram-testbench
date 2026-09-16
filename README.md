@@ -153,6 +153,31 @@ includes the ones above it:
 
 Level 1 is the useful one for CI: eight scenario banners and the result.
 
+### UVM testbench
+
+`tb_uvm/` is the same testbench expressed in UVM: same DUT, same stimulus,
+same checks. It has its own targets so the two flows never share a build
+directory.
+
+```bash
+make compile-uvm    # build the UVM simulator
+make simulate-uvm   # run it and write build/waves/tb_top_uvm.fst
+make waves-uvm      # simulate, then open GTKWave
+make lint-uvm       # lint the UVM testbench
+make check-uvm      # lint-uvm, simulate-uvm
+```
+
+`UVM_TEST=` picks the test (`spi_base_test`, the default, is the full
+regression; `spi_random_test` is 1000 random write/read pairs) and
+`UVM_VERBOSITY=UVM_NONE|UVM_LOW|UVM_MEDIUM|UVM_HIGH|UVM_DEBUG` replaces the
+`VERBOSITY=n` knob, one level for one level.
+
+Verilator only learned to elaborate UVM in 5.052, which is newer than what
+Debian and Ubuntu package. `make setup` builds that version into
+`/opt/verilator-5.052` and only the UVM targets use it, so a broken build
+there cannot take the `tb/` flow down with it. The CI job still runs `make
+check` against the packaged Verilator; it does not build the UVM testbench.
+
 ## Layout
 
 ```text
@@ -169,8 +194,23 @@ tb/test.sv            scenarios
 tb/tb_top.sv          clock, DUT instance, RAM probe, verbosity plusarg
 files.f               source list for Verilator
 patches/              local fixes to the vendor RTL
-third_party/          upstream RTL submodule
+third_party/          upstream RTL and UVM submodules
+
+tb_uvm/spi_uvm_pkg.sv      package: parameters, command enum, includes
+tb_uvm/spi_transaction.svh uvm_sequence_item
+tb_uvm/spi_driver.svh      uvm_driver
+tb_uvm/spi_input_monitor.svh, tb_uvm/ram_monitor.svh  uvm_monitor
+tb_uvm/spi_scoreboard.svh  uvm_scoreboard, two analysis fifos
+tb_uvm/spi_agent.svh       driver, sequencer, pin monitor
+tb_uvm/spi_env.svh         agent, RAM monitor, scoreboard
+tb_uvm/spi_seq_lib.svh     one sequence per scenario
+tb_uvm/spi_test.svh        uvm_test
+tb_uvm/tb_top_uvm.sv       clock, DUT instance, RAM probe, config_db
+files_uvm.f                source list for the UVM build
 ```
+
+`tb_uvm/` reuses `tb/spi_if.sv` and `tb/ram_if.sv` unchanged -- they are
+plain RTL interfaces with nothing methodology-specific in them.
 
 Generated files stay under `build/` and are ignored by Git.
 

@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('setup', 'compile', 'simulate', 'waves', 'kill-waves', 'lint', 'coverage', 'coverage-open', 'check', 'clean')]
+    [ValidateSet('setup', 'compile', 'simulate', 'waves', 'kill-waves', 'lint', 'coverage', 'coverage-open', 'check', 'clean', 'compile-uvm', 'simulate-uvm', 'waves-uvm', 'lint-uvm', 'check-uvm')]
     [string]$Target = 'simulate'
 )
 

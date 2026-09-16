@@ -1,3 +1,6 @@
 [submodule "third_party/spi_slave_ram"]
 	path = third_party/spi_slave_ram
 	url = https://github.com/Abdelrahman1810/SPI_Slave_with_Single_Port_RAM.git
+[submodule "third_party/uvm-core"]
+	path = third_party/uvm-core
+	url = https://github.com/accellera-official/uvm-core.git

@@ -35,11 +35,40 @@ if ! command -v verible-verilog-format >/dev/null 2>&1; then
     sudo tar -C /usr/local --strip-components=1 -xzf "$temporary_dir/$archive"
 fi
 
+# The distro Verilator is fine for tb/, but UVM needs 5.052 or newer -- that
+# is the release that can elaborate the UVM library at all. Build it beside
+# the packaged one rather than over it, so the tb/ flow keeps working if this
+# build ever breaks.
+uvm_verilator_version=5.052
+uvm_verilator_prefix=/opt/verilator-${uvm_verilator_version}
+
+if [[ ! -x "${uvm_verilator_prefix}/bin/verilator" ]]; then
+    echo "Building Verilator ${uvm_verilator_version} for the UVM testbench"
+    # liblz4-dev and libzstd-dev are for the FST writer this Verilator links
+    # against; without them --trace-fst fails to compile the model.
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        autoconf bison ccache flex help2man libfl-dev liblz4-dev libzstd-dev \
+        perl python3 zlib1g-dev
+
+    verilator_src="$HOME/.cache/spi-tb/verilator-src"
+    rm -rf "$verilator_src"
+    git clone --depth 1 -b "v${uvm_verilator_version}" \
+        https://github.com/verilator/verilator.git "$verilator_src"
+    (
+        cd "$verilator_src"
+        autoconf
+        ./configure --prefix="$uvm_verilator_prefix"
+        make -j"$(nproc)"
+        sudo make install
+    )
+fi
+
 git submodule update --init --recursive
 # The line above resets the vendor RTL, so put the local fixes back.
 make --no-print-directory patch-rtl
 
 verilator --version
+"${uvm_verilator_prefix}/bin/verilator" --version
 z3 --version
 gtkwave --version 2>&1 | sed -n '1p'
 verible-verilog-format --version
